@@ -29,9 +29,14 @@ conn2 = psycopg2.connect(
     host=db_host,
     port=db_port
 )
+
+print("Database connected")
+
 user_df = pd.read_sql_query('select id from segment', con=conn2)
 value_df = pd.read_sql_query('select * from segment_attribute_time_value where segment_attribute_id in (14,15,16,17) and attribute_granularity_id = 1;', con=conn2)
 attr_df = pd.read_sql_query('select id, name from segment_attribute where id in (14,15,16,17);', con=conn2)
+
+print("Query Run Complete")
 
 final_df = pd.merge(attr_df, value_df, how='left', left_on='id', right_on='segment_attribute_id')
 final_df = pd.pivot_table(final_df, columns=['name'], index=['segment_id', 'date_index', 'year', 'month', 'week','weekday'], values=['value'], aggfunc=max).reset_index()
